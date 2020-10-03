@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">Notes</string>
     <string name="action_settings">Settings</string>
+
+    <string name="text_1">This is the beginning of this very long note</string>
+    <string name="text_short_1">This is the beginning...</string>
+    <string name="timestamp_1">1588292416.38008</string>
+
 </resources>

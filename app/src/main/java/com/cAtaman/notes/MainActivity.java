@@ -7,12 +7,20 @@ import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.selection.SelectionTracker;
+import androidx.recyclerview.selection.StableIdKeyProvider;
+import androidx.recyclerview.selection.StorageStrategy;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
+    private RecyclerView recyclerView;
+    private String[] mDataset;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,7 +29,23 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        recyclerView.setHasFixedSize(true);
+
+        // use a linear layout manager
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+
+        initDataset(20);
+
+        // specify an adapter (see also next example)
+        RecyclerView.Adapter mAdapter = new NotesAdapter(mDataset);
+        recyclerView.setAdapter(mAdapter);
+
+        FloatingActionButton fab = findViewById(R.id.plus_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -52,4 +76,23 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
+    private void initDataset(int DATASET_COUNT) {
+        mDataset = new String[DATASET_COUNT];
+        for (int i = 1; i < DATASET_COUNT + 1; i++) {
+            mDataset[i-1] = "Count_Darkula " + i;
+        }
+    }
+
+//
+//    SelectionTracker tracker = new SelectionTracker.Builder<>(
+//            "my-selection-id",
+//            recyclerView,
+//            new StableIdKeyProvider(recyclerView),
+//            new NotesDetailsLookup(recyclerView),
+//            StorageStrategy.createLongStorage())
+//            .withOnItemActivatedListener(myItemActivatedListener)
+//            .build();
+
 }
