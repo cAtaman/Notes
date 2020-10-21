@@ -11,6 +11,11 @@ import androidx.recyclerview.widget.RecyclerView;
 public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHolder> {
     private String[] mDataset;
 
+    // Provide a suitable constructor (depends on the kind of dataset)
+    public NotesAdapter(String[] myDataset) {
+        mDataset = myDataset;
+    }
+
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
@@ -24,15 +29,9 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
         }
     }
 
-    // Provide a suitable constructor (depends on the kind of dataset)
-    public NotesAdapter(String[] myDataset) {
-        mDataset = myDataset;
-    }
-
     // Create new views (invoked by the layout manager)
     @Override
-    public NotesAdapter.NotesViewHolder onCreateViewHolder(ViewGroup parent,
-                                                     int viewType) {
+    public NotesAdapter.NotesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
         LinearLayout v = (LinearLayout) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.note_list_item, parent, false);

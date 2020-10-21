@@ -1,5 +1,7 @@
 package com.cAtaman.notes;
 
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -7,20 +9,19 @@ import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.selection.SelectionTracker;
-import androidx.recyclerview.selection.StableIdKeyProvider;
-import androidx.recyclerview.selection.StorageStrategy;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import java.util.ArrayList;
+
 
 public class MainActivity extends AppCompatActivity {
+    private static final int DOWNLOAD_REQUEST_CODE = 0;
     private RecyclerView recyclerView;
-    private String[] mDataset;
-
+    private String BASE_URL =  "https://atamanbc.tech";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,11 +40,12 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        initDataset(20);
-
-        // specify an adapter (see also next example)
-        RecyclerView.Adapter mAdapter = new NotesAdapter(mDataset);
-        recyclerView.setAdapter(mAdapter);
+        PendingIntent pendingResult = createPendingResult(
+                DOWNLOAD_REQUEST_CODE, new Intent(), 0);
+        final Intent intent = new Intent(getApplicationContext(), DownloadIntentService.class);
+        intent.putExtra(DownloadIntentService.URL_EXTRA, BASE_URL + "/notes/v1/");
+        intent.putExtra(DownloadIntentService.PENDING_RESULT_EXTRA, pendingResult);
+        startService(intent);
 
         FloatingActionButton fab = findViewById(R.id.plus_fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -51,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                stopService(intent);
+                startService(intent);
             }
         });
     }
@@ -78,14 +82,73 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void initDataset(int DATASET_COUNT) {
-        mDataset = new String[DATASET_COUNT];
-        for (int i = 1; i < DATASET_COUNT + 1; i++) {
-            mDataset[i-1] = "Count_Darkula " + i;
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == DOWNLOAD_REQUEST_CODE) {
+            switch (resultCode) {
+                case DownloadIntentService.INVALID_URL_CODE | DownloadIntentService.ERROR_CODE:
+                    handleError();
+                    break;
+                case DownloadIntentService.RESULT_CODE:
+                    handleNote(data);
+                    break;
+            }
+            handleNote(data);
         }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
+
+    private void handleNote(Intent data) {
+        ArrayList<String[]> notes = data.getParcelableExtra(DownloadIntentService.NOTES_RESULT_EXTRA);
+        System.out.println(notes);
+
+        String[] mDataset = new String[20];
+        for (int i = 1; i < 20 + 1; i++) {
+            mDataset[i-1] = "Count_Darkula " + i;
+        }
+        // specify an adapter (see also next example)
+        RecyclerView.Adapter mAdapter = new NotesAdapter(mDataset);
+        recyclerView.setAdapter(mAdapter);
+    }
+
+
+    private void handleError() {
+        System.out.println("Error Occurred");
+    }
+
+
+//    private void handleRSS(Intent data) {
+//        IllustrativeRSS rss = data.getParcelableExtra(DownloadIntentService.RSS_RESULT_EXTRA);
+//        ViewGroup result = (ViewGroup)findViewById(R.id.results);
+//        result.removeAllViews();
+//        for (int i=0; i<rss.size(); i++) {
+//            IllustrativeRSS.Item item = rss.get(i);
+//            TextView v = new TextView(this);
+//            v.setText(item.title);
+//            result.addView(v);
+//        }
+//    }
+
+
+//    ArrayList run(String url) throws IOException {
+//        OkHttpClient client = new OkHttpClient();
+//        Request request = new Request.Builder().url(url).build();
+//        Gson gson = new GsonBuilder().create();
+//        String resp = "";
 //
+//        try {
+//            Response response = client.newCall(request).execute();
+//            resp = response.body().string();
+//            System.out.println(resp);
+//        } catch (NullPointerException e){
+//            e.printStackTrace();
+//        }
+//
+//        return gson.fromJson(resp, ArrayList.class);
+//    }
+
+
 //    SelectionTracker tracker = new SelectionTracker.Builder<>(
 //            "my-selection-id",
 //            recyclerView,
