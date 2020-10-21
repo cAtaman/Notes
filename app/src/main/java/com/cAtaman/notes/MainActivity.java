@@ -22,6 +22,9 @@ public class MainActivity extends AppCompatActivity {
     private static final int DOWNLOAD_REQUEST_CODE = 0;
     private RecyclerView recyclerView;
     private String BASE_URL =  "https://atamanbc.tech";
+    private String BASE_PATH =  "/notes/v1/";
+    private String QUERY =  "?ret_json=True";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         PendingIntent pendingResult = createPendingResult(
                 DOWNLOAD_REQUEST_CODE, new Intent(), 0);
         final Intent intent = new Intent(getApplicationContext(), DownloadIntentService.class);
-        intent.putExtra(DownloadIntentService.URL_EXTRA, BASE_URL + "/notes/v1/");
+        intent.putExtra(DownloadIntentService.URL_EXTRA, BASE_URL + BASE_PATH + QUERY);
         intent.putExtra(DownloadIntentService.PENDING_RESULT_EXTRA, pendingResult);
         startService(intent);
 
@@ -100,15 +103,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void handleNote(Intent data) {
-        ArrayList<String[]> notes = data.getParcelableExtra(DownloadIntentService.NOTES_RESULT_EXTRA);
-        System.out.println(notes);
-
-        String[] mDataset = new String[20];
-        for (int i = 1; i < 20 + 1; i++) {
-            mDataset[i-1] = "Count_Darkula " + i;
-        }
+        ArrayList notes = data.getParcelableArrayListExtra(DownloadIntentService.NOTES_RESULT_EXTRA);
         // specify an adapter (see also next example)
-        RecyclerView.Adapter mAdapter = new NotesAdapter(mDataset);
+        RecyclerView.Adapter mAdapter = new NotesAdapter(notes);
         recyclerView.setAdapter(mAdapter);
     }
 
@@ -116,37 +113,6 @@ public class MainActivity extends AppCompatActivity {
     private void handleError() {
         System.out.println("Error Occurred");
     }
-
-
-//    private void handleRSS(Intent data) {
-//        IllustrativeRSS rss = data.getParcelableExtra(DownloadIntentService.RSS_RESULT_EXTRA);
-//        ViewGroup result = (ViewGroup)findViewById(R.id.results);
-//        result.removeAllViews();
-//        for (int i=0; i<rss.size(); i++) {
-//            IllustrativeRSS.Item item = rss.get(i);
-//            TextView v = new TextView(this);
-//            v.setText(item.title);
-//            result.addView(v);
-//        }
-//    }
-
-
-//    ArrayList run(String url) throws IOException {
-//        OkHttpClient client = new OkHttpClient();
-//        Request request = new Request.Builder().url(url).build();
-//        Gson gson = new GsonBuilder().create();
-//        String resp = "";
-//
-//        try {
-//            Response response = client.newCall(request).execute();
-//            resp = response.body().string();
-//            System.out.println(resp);
-//        } catch (NullPointerException e){
-//            e.printStackTrace();
-//        }
-//
-//        return gson.fromJson(resp, ArrayList.class);
-//    }
 
 
 //    SelectionTracker tracker = new SelectionTracker.Builder<>(

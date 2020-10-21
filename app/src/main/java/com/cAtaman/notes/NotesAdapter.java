@@ -8,11 +8,14 @@ import android.widget.TextView;
 import androidx.recyclerview.selection.ItemDetailsLookup;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHolder> {
-    private String[] mDataset;
+    private ArrayList mDataset;
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public NotesAdapter(String[] myDataset) {
+    public NotesAdapter(ArrayList myDataset) {
         mDataset = myDataset;
     }
 
@@ -45,14 +48,14 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
     public void onBindViewHolder(NotesViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        holder.mText.setText(mDataset[position]);
-        holder.mTimestamp.setText(mDataset[position]);
+        holder.mText.setText((String) ((HashMap) mDataset.get(position)).get("content"));
+        holder.mTimestamp.setText((String) ((HashMap) mDataset.get(position)).get("datetime"));
 
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return mDataset.length;
+        return mDataset.size();
     }
 }
